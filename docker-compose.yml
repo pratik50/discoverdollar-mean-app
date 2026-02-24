@@ -2,7 +2,6 @@ services:
   mongodb:
     image: mongo:6
     container_name: mongodb
-    restart: aunless-stopped
     volumes:
       - mongo_data:/data/db
 
