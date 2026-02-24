@@ -4,7 +4,7 @@ const cors = require("cors");
 const app = express();
 
 app.use(cors({
-  origin: "http://localhost:8081"
+  origin: ["http://localhost", "http://localhost:8081", "http://localhost:80"]
 }));
 
 // parse requests of content-type - application/json
