@@ -1,29 +1,31 @@
-version: '3.8'
-
 services:
   mongodb:
     image: mongo:6
     container_name: mongodb
+    restart: aunless-stoppeds
     volumes:
       - mongo_data:/data/db
 
   backend:
-    build: ./backend
+    image: pratik50/dd-backend:latest
     container_name: backend
+    restart: unless-stopped
     environment:
       - MONGODB_URI=mongodb://mongodb:27017/dd_db
     depends_on:
       - mongodb
 
   frontend:
-    build: ./frontend
+    image: pratik50/dd-frontend:latest
     container_name: frontend
+    restart: unless-stopped
     depends_on:
       - backend
 
   nginx:
     image: nginx:alpine
     container_name: nginx
+    restart: unless-stopped
     ports:
       - "80:80"
     volumes:
