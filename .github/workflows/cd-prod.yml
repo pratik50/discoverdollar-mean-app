@@ -1,0 +1,31 @@
+name: Production CD Pipeline
+
+on:
+  push:
+    branches:
+      - production
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to Production EC2 via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.PROD_VM_HOST }}
+          username: ${{ secrets.PROD_VM_USER }}
+          key: ${{ secrets.PROD_VM_SSH_KEY }}
+          script: |
+            set -e
+            APP_DIR=~/app
+            if [ ! -d "$APP_DIR" ]; then
+              git clone --depth 1 https://github.com/pratik50/discoverdollar-mean-app.git $APP_DIR
+            else
+              cd $APP_DIR
+              git fetch origin production
+              git reset --hard origin/production
+            fi
+            cd $APP_DIR
+            docker compose pull
+            docker compose up -d --remove-orphans --force-recreate
+            docker image prune -af
