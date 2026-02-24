@@ -12,14 +12,22 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
     steps:
-      - name: Deploy to VM
+      - name: Deploy to EC2 via SSH
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.VM_HOST }}
           username: ${{ secrets.VM_USER }}
           key: ${{ secrets.VM_SSH_KEY }}
           script: |
-            mkdir -p ~/app
-            cd ~/app
-            docker-compose pull
-            docker-compose up -d
+            set -e
+            APP_DIR=~/app
+            if [ ! -d "$APP_DIR" ]; then
+              git clone --depth 1 https://github.com/pratik50/discoverdollar-mean-app.git $APP_DIR
+            else
+              cd $APP_DIR
+              git pull origin main
+            fi
+            cd $APP_DIR
+            docker compose pull
+            docker compose up -d --remove-orphans
+            docker image prune -af
